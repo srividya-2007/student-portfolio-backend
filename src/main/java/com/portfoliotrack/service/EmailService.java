@@ -2,6 +2,7 @@ package com.portfoliotrack.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,6 +17,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
+    @Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
+
     @Autowired(required = false)
     private JavaMailSender mailSender;
 
@@ -25,7 +29,7 @@ public class EmailService {
         msg.setSubject("PortfolioTrack – Password Reset");
         msg.setText(
             "Click the link to reset your password:\n\n" +
-            "http://localhost:5173/reset-password?token=" + token +
+            frontendUrl + "/reset-password?token=" + token +
             "\n\nThis link expires in 1 hour."
         );
         sendSafely(msg);

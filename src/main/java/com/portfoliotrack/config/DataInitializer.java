@@ -9,15 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * Seeds the database with a default ADMIN user on first startup.
- * This is the only way to get an ADMIN account since the /api/auth/register
- * endpoint always creates STUDENT users.
- *
- * Default credentials:
- *   Email   : admin@portfoliotrack.com
- *   Password: Admin@123
- *
- * Change these immediately after first login.
+ * Seeds the database with demo accounts on first startup.
  */
 @Slf4j
 @Component
@@ -29,10 +21,14 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        String adminEmail = "admin@portfoliotrack.com";
+        seedAdmin();
+        seedDemoStudent();
+    }
 
+    private void seedAdmin() {
+        String adminEmail = "admin@portfoliotrack.com";
         if (userRepository.existsByEmail(adminEmail)) {
-            log.info("Admin account already exists — skipping seed.");
+            log.info("Admin account already exists - skipping seed.");
             return;
         }
 
@@ -45,11 +41,27 @@ public class DataInitializer implements CommandLineRunner {
                 .build();
 
         userRepository.save(admin);
-        log.info("======================================================");
-        log.info(" Default admin account created:");
-        log.info("   Email   : {}", adminEmail);
-        log.info("   Password: Admin@123");
-        log.info(" CHANGE THIS PASSWORD AFTER FIRST LOGIN!");
-        log.info("======================================================");
+        log.info("Default admin account created: {} / Admin@123", adminEmail);
+    }
+
+    private void seedDemoStudent() {
+        String studentEmail = "student@portfoliotrack.com";
+        if (userRepository.existsByEmail(studentEmail)) {
+            log.info("Demo student account already exists - skipping seed.");
+            return;
+        }
+
+        User student = User.builder()
+                .fullName("Demo Student")
+                .email(studentEmail)
+                .password(passwordEncoder.encode("student123"))
+                .studentId("22BCE0001")
+                .department("Computer Science & Engineering")
+                .role(User.Role.STUDENT)
+                .active(true)
+                .build();
+
+        userRepository.save(student);
+        log.info("Demo student account created: {} / student123", studentEmail);
     }
 }

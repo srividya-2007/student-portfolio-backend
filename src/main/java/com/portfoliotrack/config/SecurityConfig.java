@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 @Configuration
@@ -26,8 +27,14 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
 
+    @Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
+
     @Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:3000}")
     private String allowedOrigins;
+
+    @Value("${app.cors.allowed-origin-patterns:https://*.vercel.app,https://*.netlify.app,https://*.up.railway.app}")
+    private String allowedOriginPatterns;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -54,15 +61,28 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.stream(allowedOrigins.split(","))
-                .map(String::trim)
-                .filter(origin -> !origin.isEmpty())
-                .toList());
+        config.setAllowedOrigins(parseCsv(frontendUrl, allowedOrigins));
+        config.setAllowedOriginPatterns(parseCsv(allowedOriginPatterns));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
+    }
+
+    private List<String> parseCsv(String... values) {
+        LinkedHashSet<String> parsedValues = new LinkedHashSet<>();
+        for (String value : values) {
+            if (value == null) {
+                continue;
+            }
+
+            Arrays.stream(value.split(","))
+                    .map(String::trim)
+                    .filter(origin -> !origin.isEmpty())
+                    .forEach(parsedValues::add);
+        }
+        return List.copyOf(parsedValues);
     }
 }

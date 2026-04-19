@@ -21,7 +21,8 @@ public class AuthService {
     private final EmailService emailService;
 
     public AuthResponse register(RegisterRequest req) {
-        if (userRepository.existsByEmail(req.getEmail())) {
+        String email = normalizeEmail(req.getEmail());
+        if (userRepository.existsByEmail(email)) {
             throw new RuntimeException("Email already registered");
         }
 
@@ -34,10 +35,10 @@ public class AuthService {
 
         User user = User.builder()
                 .fullName(req.getFullName())
-                .email(req.getEmail())
+                .email(email)
                 .password(passwordEncoder.encode(req.getPassword()))
-                .studentId(role == User.Role.STUDENT ? req.getStudentId() : null)
-                .department(isBlank(req.getDepartment()) ? null : req.getDepartment())
+                .studentId(role == User.Role.STUDENT ? clean(req.getStudentId()) : null)
+                .department(clean(req.getDepartment()))
                 .role(role)
                 .active(true)
                 .build();
@@ -46,7 +47,7 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest req) {
-        User user = userRepository.findByEmail(req.getEmail())
+        User user = userRepository.findByEmail(normalizeEmail(req.getEmail()))
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
         if (!user.isActive()) throw new RuntimeException("Account disabled");
         if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
@@ -56,7 +57,7 @@ public class AuthService {
     }
 
     public void forgotPassword(String email) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(normalizeEmail(email))
                 .orElseThrow(() -> new RuntimeException("Email not found"));
         String token = UUID.randomUUID().toString();
         user.setResetToken(token);
@@ -104,5 +105,14 @@ public class AuthService {
 
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
+    }
+
+    private String clean(String value) {
+        return isBlank(value) ? null : value.trim();
+    }
+
+    private String normalizeEmail(String email) {
+        String cleanedEmail = clean(email);
+        return cleanedEmail == null ? null : cleanedEmail.toLowerCase();
     }
 }
