@@ -27,9 +27,15 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody ForgotPasswordRequest req) {
+    public ResponseEntity<Map<String, String>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest req) {
         authService.forgotPassword(req.getEmail());
-        return ResponseEntity.ok(Map.of("message", "Reset link sent to your email"));
+        return ResponseEntity.ok(Map.of("message", "Verification code sent to your email"));
+    }
+
+    @PostMapping("/verify-reset-otp")
+    public ResponseEntity<Map<String, String>> verifyResetOtp(@Valid @RequestBody VerifyOtpRequest req) {
+        authService.verifyResetOtp(req);
+        return ResponseEntity.ok(Map.of("message", "OTP verified successfully"));
     }
 
     @PostMapping("/reset-password")

@@ -62,6 +62,7 @@ public class ProjectService {
                 .githubUrl(req.getGithubUrl())
                 .liveUrl(req.getLiveUrl())
                 .documentationUrl(req.getDocumentationUrl())
+                .showcaseLocation(req.getShowcaseLocation())
                 .status(Project.ProjectStatus.PENDING)
                 .student(student)
                 .build();
@@ -82,6 +83,7 @@ public class ProjectService {
         p.setGithubUrl(req.getGithubUrl());
         p.setLiveUrl(req.getLiveUrl());
         p.setDocumentationUrl(req.getDocumentationUrl());
+        p.setShowcaseLocation(req.getShowcaseLocation());
         p.setStatus(Project.ProjectStatus.PENDING);
         projectRepository.save(p);
         return toResponse(p);
@@ -171,6 +173,7 @@ public class ProjectService {
         r.setLiveUrl(p.getLiveUrl());
         r.setDocumentationUrl(p.getDocumentationUrl());
         r.setImageUrl(p.getImageUrl());
+        r.setShowcaseLocation(p.getShowcaseLocation());
         r.setStatus(p.getStatus().name());
         r.setReviewComment(p.getReviewComment());
         r.setStudentUserId(p.getStudent().getId());

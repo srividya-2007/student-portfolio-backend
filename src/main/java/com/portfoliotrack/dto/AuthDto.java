@@ -38,8 +38,17 @@ public class AuthDto {
     }
 
     @Data
+    public static class VerifyOtpRequest {
+        @Email @NotBlank private String email;
+        @Pattern(regexp = "\\d{6}", message = "OTP must be a 6-digit code")
+        private String otp;
+    }
+
+    @Data
     public static class ResetPasswordRequest {
-        @NotBlank private String token;
+        @Email @NotBlank private String email;
+        @Pattern(regexp = "\\d{6}", message = "OTP must be a 6-digit code")
+        private String otp;
         @Size(min = 6) @NotBlank private String newPassword;
     }
 }

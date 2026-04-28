@@ -33,6 +33,7 @@ public class Project {
     private String liveUrl;
     private String documentationUrl;
     private String imageUrl;
+    private String showcaseLocation;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

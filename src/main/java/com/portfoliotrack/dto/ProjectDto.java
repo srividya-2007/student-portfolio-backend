@@ -15,6 +15,7 @@ public class ProjectDto {
         private String githubUrl;
         private String liveUrl;
         private String documentationUrl;
+        private String showcaseLocation;
     }
 
     @Data
@@ -28,6 +29,7 @@ public class ProjectDto {
         private String liveUrl;
         private String documentationUrl;
         private String imageUrl;
+        private String showcaseLocation;
         private String status;
         private String reviewComment;
         private Long studentUserId;
@@ -40,4 +42,3 @@ public class ProjectDto {
         private LocalDateTime updatedAt;
     }
 }
-

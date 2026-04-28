@@ -5,6 +5,7 @@ import com.portfoliotrack.dto.ProjectDto.ProjectResponse;
 import com.portfoliotrack.entity.User;
 import com.portfoliotrack.repository.ProjectRepository;
 import com.portfoliotrack.repository.UserRepository;
+import com.portfoliotrack.service.AdminService;
 import com.portfoliotrack.service.NotificationService;
 import com.portfoliotrack.service.ProjectService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminController {
 
+    private final AdminService adminService;
     private final ProjectService projectService;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
@@ -31,21 +33,7 @@ public class AdminController {
 
     @GetMapping("/dashboard")
     public ResponseEntity<Map<String, Object>> getDashboard() {
-        Map<String, Object> data = new HashMap<>();
-        data.put("totalStudents", userRepository.findAll().stream()
-                .filter(u -> u.getRole() == User.Role.STUDENT).count());
-        data.put("totalProjects", projectRepository.count());
-        data.put("approvedCount", projectRepository.countByStatus(
-                com.portfoliotrack.entity.Project.ProjectStatus.APPROVED));
-        data.put("pendingCount", projectRepository.countByStatus(
-                com.portfoliotrack.entity.Project.ProjectStatus.PENDING));
-        data.put("rejectedCount", projectRepository.countByStatus(
-                com.portfoliotrack.entity.Project.ProjectStatus.REJECTED));
-        data.put("underReviewCount", projectRepository.countByStatus(
-                com.portfoliotrack.entity.Project.ProjectStatus.UNDER_REVIEW));
-        data.put("recentProjects", projectService.getAllProjects().stream()
-                .limit(10).collect(Collectors.toList()));
-        return ResponseEntity.ok(data);
+        return ResponseEntity.ok(adminService.getDashboard());
     }
 
     @PutMapping("/projects/{id}/review")
