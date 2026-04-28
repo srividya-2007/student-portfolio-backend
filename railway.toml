@@ -1,0 +1,10 @@
+[build]
+builder = "RAILPACK"
+buildCommand = "mvn -DskipTests clean package"
+
+[deploy]
+startCommand = "sh -c 'exec java -Dserver.port=$PORT -jar target/student-portfolio-backend-1.0.0.jar'"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 180
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
